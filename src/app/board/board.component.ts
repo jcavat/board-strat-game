@@ -35,8 +35,8 @@ export class BoardComponent implements OnInit {
 
   ngOnInit() {
     const hexbin = d3hex.hexbin()
-      .radius(this.hexSize)
-      .extent([[0, 0], [this.hexSize, this.height]]);
+      .extent([[0, 0], [this.hexSize, this.height]])
+      .radius(this.hexSize);
 
 //    d3.select(".board").data([1, 2, 2, 3]).enter().append("p").text( d => "coucou" + d).exit().remove();
 
@@ -47,21 +47,30 @@ export class BoardComponent implements OnInit {
     const pointsX: number[] = d3.range(this.width/this.hexSize)
       .map( (i: number): number => i );
     const pointsXY: [number, number][] = pointsX.map(
-      i => d3.range(this.height/this.hexSize)
-        .map((j: number): [number,number] => [i*this.hexSize,j*this.hexSize])).reduce( (a,b) => a.concat(b));
+    i => d3.range(this.height/this.hexSize)
+        //                                              x                           y
+  .map((j: number): [number,number] => [j*Math.sqrt(3)/2*this.hexSize*2+5,i*this.hexSize*3/2,])).reduce( (a,b) => a.concat(b));
     console.log(pointsXY);
 
     d3.select("svg")
-      .style("padding", this.hexSize)
+      .style("padding", this.hexSize);
 
     d3.select("svg").selectAll("path")
       .data(hexbin(pointsXY))
       .enter().append("path")
-      .attr("d", hexbin.hexagon(this.hexSize-0.5))
+      .attr("d", hexbin.hexagon(this.hexSize-this.hexMargin))
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")rotate(90)"; })
       .attr("stroke", "gray")
       .attr("stroke-width", "0.5px")
       .attr("fill", "blue");
+
+    d3.select("svg").selectAll("circle")
+      .data(pointsXY).enter()
+      .append("circle")
+      .attr("cx", function (d) { return d[0]; })
+      .attr("cy", function (d) { return d[1]; })
+      .attr("r", "2px")
+      .attr("fill", "red")
   }
 
 
